@@ -1,0 +1,7 @@
+import {CustomHeightmapTerrainProvider,GeographicTilingScheme,Math as CMath} from 'cesium';
+export async function loadTerrain(base){
+  const [mr,br]=await Promise.all([fetch(`${base}geo/hk-terrain.json`),fetch(`${base}geo/hk-terrain.bin`)]);if(!mr.ok||!br.ok)throw Error('香港地形加载失败');
+  const meta=await mr.json(), bytes=await br.arrayBuffer(), view=new DataView(bytes), values=new Int16Array(bytes.byteLength/2);for(let i=0;i<values.length;i++)values[i]=view.getInt16(i*2,true);
+  function sample(lon,lat){if(lon<meta.west||lon>meta.east||lat<meta.south||lat>meta.north)return 0;const x=(lon-meta.west)/(meta.east-meta.west)*(meta.width-1),y=(meta.north-lat)/(meta.north-meta.south)*(meta.height-1),a=Math.floor(x),b=Math.floor(y),c=Math.min(a+1,meta.width-1),d=Math.min(b+1,meta.height-1),tx=x-a,ty=y-b;return (values[b*meta.width+a]*(1-tx)+values[b*meta.width+c]*tx)*(1-ty)+(values[d*meta.width+a]*(1-tx)+values[d*meta.width+c]*tx)*ty;}
+  const scheme=new GeographicTilingScheme();const provider=new CustomHeightmapTerrainProvider({width:33,height:33,tilingScheme:scheme,credit:'Terrain: Mapzen / AWS Open Data',callback(x,y,level){const r=scheme.tileXYToRectangle(x,y,level),data=new Float32Array(33*33);for(let j=0;j<33;j++)for(let i=0;i<33;i++)data[j*33+i]=sample(CMath.toDegrees(r.west+(r.east-r.west)*i/32),CMath.toDegrees(r.north-(r.north-r.south)*j/32));return data;}});return{provider,sample,meta};
+}

@@ -1,0 +1,6 @@
+import {validateCheckpoint} from '../backend/src/validation.mjs';
+const KEY='nextgen-evtol.checkpoint.v1';
+export function readSave(scene){try{const raw=localStorage.getItem(KEY);return raw?{checkpoint:validateCheckpoint(scene,JSON.parse(raw)),error:null}:{checkpoint:null,error:null};}catch{return{checkpoint:null,error:'上次存档无法恢复，可以开始新的航程。'};}}
+export function writeSave(state){try{localStorage.setItem(KEY,JSON.stringify({schemaVersion:1,savedAt:new Date().toISOString(),state}));return true;}catch{return false;}}
+function openPhotos(){return new Promise((resolve,reject)=>{const r=indexedDB.open('nextgen-evtol',1);r.onupgradeneeded=()=>r.result.createObjectStore('photos',{keyPath:'id'});r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});}
+export async function photoStore(action,value){const db=await openPhotos();return new Promise((resolve,reject)=>{const tx=db.transaction('photos',action==='getAll'?'readonly':'readwrite');const s=tx.objectStore('photos'),r=action==='getAll'?s.getAll():action==='put'?s.put(value):s.delete(value);let result;r.onsuccess=()=>{result=r.result;};tx.oncomplete=()=>{db.close();resolve(result);};tx.onerror=()=>{db.close();reject(tx.error);};});}
