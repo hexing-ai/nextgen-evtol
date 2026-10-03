@@ -7,6 +7,7 @@ import{createFlight,stepFlight,setMode,setPaused,setCamera,discoverLandmark}from
 import{readSave,writeSave,photoStore}from'./storage';
 import{CabinAudio}from'./audio';
 import './style.css';
+import{advanceFrame}from'./advance-frame.mjs';
 const scene=catalog.scene,fmt=n=>`${String(Math.floor(n/60)).padStart(2,'0')}:${String(Math.floor(n%60)).padStart(2,'0')}`;
 const phases={takeoff:'垂直起飞',transition:'驶向海港',cruise:'海港巡航',approach:'接近西九龙',landing:'平稳降落',arrived:'抵达西九龙'};
 const cameraNames={window:'舷窗',forward:'前舱',chase:'外部'};
@@ -27,7 +28,7 @@ function App(){
  const start=(restore=false)=>{document.activeElement?.blur();const state=restore&&saved?saved.state:createFlight(scene,selectedMode);update({...state,camera:restore?state.camera:selectedMode==='pilot'?'chase':'window',pauseReason:restore?'user':null});setStage('flight');setModal(null);persist();};
  const goHome=()=>{persist();const save=readSave(scene);setSaved(save.checkpoint);update(createFlight(scene));setStage('boarding');setModal(null);apiRef.current?.resetView();};
  useEffect(()=>{audio.current=new CabinAudio();const stored=readSave(scene);setSaved(stored.checkpoint);if(stored.error)notify(stored.error);photoStore('getAll').then(p=>setPhotos(p.sort((a,b)=>b.id-a.id))).catch(()=>{});let last=performance.now(),lastUi=0,lastSave=0,frame;
-   const animate=now=>{const dt=Math.min(.1,(now-last)/1000);last=now;if(stageRef.current==='flight'){flightRef.current=stepFlight(scene,flightRef.current,keys.current,dt);audio.current.update(flightRef.current.pauseReason===null&&flightRef.current.status!=='arrived');if(now-lastUi>90){setFlight({...flightRef.current});lastUi=now;}if(now-lastSave>5000){setStorageOk(writeSave(flightRef.current));lastSave=now;}}else audio.current.update(false);frame=requestAnimationFrame(animate);};frame=requestAnimationFrame(animate);
+   const animate=now=>{const dt=Math.min(1,(now-last)/1000);last=now;if(stageRef.current==='flight'){flightRef.current=advanceFrame(scene,flightRef.current,keys.current,dt);audio.current.update(flightRef.current.pauseReason===null&&flightRef.current.status!=='arrived');if(now-lastUi>90){setFlight({...flightRef.current});lastUi=now;}if(now-lastSave>5000){setStorageOk(writeSave(flightRef.current));lastSave=now;}}else audio.current.update(false);frame=requestAnimationFrame(animate);};frame=requestAnimationFrame(animate);
    const pressed=new Set();function setKeys(){keys.current={throttle:Number(pressed.has('KeyW'))-Number(pressed.has('KeyS')),turn:Number(pressed.has('KeyD'))-Number(pressed.has('KeyA')),climb:Number(pressed.has('KeyQ'))-Number(pressed.has('KeyE')),hover:pressed.has('Space')};}
    const down=e=>{if(stageRef.current!=='flight'||/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)||document.querySelector('.modal-backdrop'))return;if(['KeyW','KeyS','KeyA','KeyD','KeyQ','KeyE','Space'].includes(e.code)){e.preventDefault();pressed.add(e.code);setKeys();}if(e.code==='Escape'){setFlight(flightRef.current=setPaused(flightRef.current,flightRef.current.pauseReason?null:'user'));}};
    const up=e=>{pressed.delete(e.code);setKeys();};const lost=()=>{pressed.clear();keys.current={};if(stageRef.current==='flight'&&document.hidden){flightRef.current=setPaused(flightRef.current,'focus');setFlight({...flightRef.current});writeSave(flightRef.current);}};

@@ -87,3 +87,17 @@ test('terrain protection catches a ridge between otherwise clear endpoints', () 
   assert.equal(movementAllowed(terrainScene,{x:-100,y:500,z:80},{x:100,y:500,z:80}),false);
   assert.equal(movementAllowed(terrainScene,{x:-100,y:500,z:160},{x:100,y:500,z:160}),true);
 });
+
+test('slow rendered frames preserve elapsed flight time instead of slowing the journey', async () => {
+  const {advanceFrame}=await import('../../frontend/advance-frame.mjs');
+  const initial=createFlight(scene);
+  const state=advanceFrame(scene,initial,{},.8);
+  assert.ok(Math.abs(state.elapsedSeconds-.8)<1e-8);
+  assert.ok(Math.abs(state.routeSeconds-.8)<1e-8);
+  assert.ok(distance(state.position,sampleRoute(scene,.8).position)<1e-7);
+});
+test('background-paused flight remains frozen even after a long frame', async () => {
+  const {advanceFrame}=await import('../../frontend/advance-frame.mjs');
+  const state=setPaused(createFlight(scene),'focus');
+  assert.deepEqual(advanceFrame(scene,state,{},60),state);
+});
