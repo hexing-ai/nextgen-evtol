@@ -37,7 +37,7 @@ npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite, usually **http://127.0.0.1:5173**. Once the boarding button is enabled, the scene is ready. If the port is busy, Vite picks the next available one.
+Open the URL printed by Vite, usually [http://127.0.0.1:5173](http://127.0.0.1:5173). Once the boarding button is enabled, the scene is ready. If the port is busy, Vite picks the next available one.
 
 No `.env`, database, Cesium ion token, or backend process is required. Terrain, building snapshots, and the aircraft are included. **`npm start` runs the optional REST API, not the website.**
 
