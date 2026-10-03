@@ -1,71 +1,113 @@
 # Nextgen eVTOL
 
-[在线体验](https://hexing-ai.github.io/nextgen-evtol/) · [GitHub 仓库](https://github.com/hexing-ai/nextgen-evtol)
+**如果未来可以乘 eVTOL 穿过香港，你会选择靠窗看风景，还是亲手驾驶？**
 
-以香港维多利亚港为场景的未来 eVTOL 出行体验。乘客观景与轻驾驶自由切换，可拍照、发现地标、暂停并恢复航程。
+在浏览器里登上概念飞行器 NG-01，从中环海滨飞往西九龙。随时切换乘客观景与轻驾驶，用一段 5 分 30 秒的航程，体验未来的维港日常。
 
-首版是可交互的浏览器三维原型：开放地形、真实建筑轮廓与原创概念机型。不是官方精细数字孪生，也不是飞行训练或导航软件。
+[![Build and deploy](https://github.com/hexing-ai/nextgen-evtol/actions/workflows/pages.yml/badge.svg)](https://github.com/hexing-ai/nextgen-evtol/actions/workflows/pages.yml)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-进入维港-216078)](https://hexing-ai.github.io/nextgen-evtol/)
+[![Node](https://img.shields.io/badge/Node.js-22.12%2B-43853d)](https://nodejs.org/)
 
-## 本地运行
+**[立即体验 ↗](https://hexing-ai.github.io/nextgen-evtol/)** · [本地启动](#本地启动) · [架构说明](docs/ARCHITECTURE.md) · [English](README.en.md)
 
-Node.js 22.12+。
+[![Nextgen eVTOL 实机：中环海滨登机界面与 NG-01 概念机型](docs/images/boarding.png)](https://hexing-ai.github.io/nextgen-evtol/)
+
+*当前版本的浏览器实机截图。开放地理数据搭建的可玩三维原型，采用简化建筑与概念设施。*
+
+## 三分钟，认识你的第一次空中通勤
+
+无需注册、无需安装客户端、无需 API key。[打开 Demo](https://hexing-ai.github.io/nextgen-evtol/)，等场景准备完成后：
+
+1. **登机看香港**：选择「乘客观景」→「开始登机」，自动起飞；拖动画面环顾，切换舷窗、前舱、外部镜头。
+2. **接过驾驶权**：点顶部「轻驾驶」，用 W/S、A/D、Q/E 探索维港；点「交还自动驾驶」尝试接回原航线。
+3. **带走一张风景**：点「拍照」，从右侧相册下载；点可见地标标签发现香港。离开页面会自动暂停，可稍后恢复。
+
+完整自动航程约 5 分 30 秒；手动探索和暂停会延长体验。建议先用桌面浏览器，首次加载时间取决于网络和 GPU。
+
+## 你能体验什么
+
+| 体验 | 当前实现 |
+| --- | --- |
+| 坐下来旅行 | 中环海滨 → 西九龙海滨，垂直起飞、巡航、进近与降落 |
+| 随时轻驾驶 | 加减速、转向、升降、减速悬停与自动接回；区域、地形和建筑保护 |
+| 换个角度看香港 | 舷窗、前舱、外部跟随；拖动环顾、地标发现 |
+| 留住这一程 | 本机相册最多 12 张，可下载；航程自动存档、暂停后恢复 |
+
+| 乘客观景 · 舷窗 | 轻驾驶 · 外部跟随 |
+| --- | --- |
+| ![实机：乘客模式下的中环天际线](docs/images/passenger.png) | ![实机：外部跟随镜头和轻驾驶仪表](docs/images/pilot.png) |
+
+地形来自香港区域 DEM，维港核心区包含 **7,748 个 OSM 建筑及建筑分层轮廓**。建筑为轮廓拉伸与简化立面，部分高度估算；不是官方精细数字孪生。截图来源与数据署名见 [展示素材说明](docs/images/README.md)。
+
+## 本地启动
+
+准备好 **Git、Node.js 22.12+ 和 npm**。推荐 Node 22 LTS；使用 nvm 时可运行 `nvm install && nvm use`。
 
 ```sh
+git clone https://github.com/hexing-ai/nextgen-evtol.git
+cd nextgen-evtol
 npm ci
 npm run dev
 ```
 
-按终端输出打开本机地址，默认 5173，已占用时 Vite 会使用下一个空闲端口。
+打开终端显示的地址，通常为 **http://127.0.0.1:5173**。看到「维港初航」和可点击的「开始登机」即启动成功。端口占用时 Vite 会选下一个空闲端口。
+
+**不需要 `.env`、数据库、Cesium ion token 或单独启动后端。** 地形、建筑快照和机型已随仓库提供。`npm start` 启动的是可选 REST API，不是网页。
+
+需要支持 **WebGL 2**、开启硬件加速的现代浏览器。在线卫星影像和字体需要联网；影像服务失败时仍可显示本地地形和建筑。遇到问题见 [安装与排错](docs/DEVELOPMENT.md#常见问题)。
 
 ```sh
-npm run check      # 航线校验、自动化测试、生产构建与静态接口导出
-npm run preview    # 预览 dist，默认 4173
-npm start          # 可选本地 REST API，127.0.0.1:8787
+npm run check      # 数据校验 + 自动化测试 + 生产构建 + 静态接口导出
+npm run preview    # 构建后预览，通常为 http://127.0.0.1:4173
 ```
 
-WebGL 2 和硬件加速是必要条件。首次加载需要下载三维运行库及本地地理资源；在线卫星影像、Google Fonts 需要联网。影像在后台加载，失败时保留三维地形和建筑。建议桌面浏览器；小屏提供触控方向按钮与流畅画质设置。
+## 操作速查
 
-## 体验
+| 操作 | 输入 |
+| --- | --- |
+| 前进 / 减速 | W / S（轻驾驶模式） |
+| 左转 / 右转 | A / D |
+| 上升 / 下降 | Q / E |
+| 减速悬停 | Space |
+| 暂停 / 继续 | Esc，或右上角按钮 |
+| 环顾 / 回正 | 拖动画面 /「回正视角」 |
+| 切换模式、镜头、拍照 | 点击界面按钮 |
 
-- **乘客**：自动完成中环海滨 → 西九龙海滨的 5 分 30 秒概念航线。
-- **轻驾驶**：W/S 前进与减速、A/D 转向、Q/E 上升与下降、空格减速悬停。可随时交还自动驾驶。
-- **镜头**：舷窗、前舱、外部跟随；拖动画面环顾，点击回正视角恢复默认方向。
-- **暂停**：点击暂停或按 Escape。离开页面自动暂停，恢复存档后也保持暂停。
-- **摄影**：将当前三维画面保存到本机 IndexedDB 相册，最多 12 张，支持下载与删除。
-- **存档**：飞行进度每 5 秒及主要操作时保存至本机 localStorage。没有云端账户；不同设备不共享进度。
+小屏提供触控方向按钮；设置里可切换流畅画质。存档和照片只在当前浏览器保存，不跨设备同步。
 
-## 地理数据与边界
+## 它是怎样运行的
 
-- 香港区域 DEM：113.83–114.45°E，22.15–22.58°N，来源为 Mapzen Terrain Tiles，重采样为本地高度网格。
-- 维港核心区约 7,748 个 OSM 建筑及建筑分层轮廓；有高度或层数时按标注使用，缺失时根据类型估算。未涵盖所有多面关系或最新建筑。
-- IFC、ICC 等核心地标的轮廓是原创简化模型。坐标、高度和视线不是测绘验收结果。
-- 起降平台、NG-01 六旋翼飞机和飞行航线均为未来概念设施。
-- 游戏限制在维港观景区域，有边界、DEM 高度与建筑包围盒保护。不是全港自由飞行，未验证真实空域或工程安全。
-- 香港地政总署官方 3D Tiles 服务已核查，需要授权 key；首版未接入该精细模型服务。
+React 负责界面，Resium / CesiumJS 渲染香港。浏览器直接运行共享飞行逻辑，GitHub Pages 仅提供静态文件，因此体验过程不需要后端服务器。
 
-地理数据处理脚本：`scripts/fetch-terrain.mjs`、`prepare-geography.mjs`、`prepare-protection.mjs`。建筑提取使用 OSM 官方地图 API 的分块输出，准备脚本接受合并的 OSM JSON。原始节点数据不在此仓库中；公开的派生建筑数据库包含源 way ID。
-
-## 架构与开源复用
-
-React + Resium 管理页面与三维生命周期，CesiumJS 提供地理坐标、地形、建筑、模型与镜头渲染。参考 Flight3DView 的播放/镜头组织方式，没有复制其业务代码。UI、机型、航程状态与交互为本项目实现。
-
-`backend/src/flight.mjs`、`geometry.mjs`、`validation.mjs` 同时供 Node API 与浏览器使用。前端直接使用同源版本化场景和共享逻辑，不向 Pages 发动态 POST 请求。
-
-```text
-frontend/             页面、三维场景、地形适配、摄影与声音
-backend/data/         版本化场景、航线、障碍与资料来源
-backend/src/          REST API 和浏览器共享飞行逻辑
-backend/test/         飞行规则、地形保护、HTTP 集成测试
-public/geo/           OSM 建筑数据库和地形高度网格
-public/models/        原创 NG-01 glTF 机型
-scripts/              资源准备、地理数据处理与静态接口导出
-docs/                 接口与验收记录
+```mermaid
+flowchart LR
+    Input[乘客 / 轻驾驶输入] --> UI[React 界面]
+    UI <--> Flight[共享飞行逻辑]
+    Data[版本化航线与保护数据] --> Flight
+    Flight --> World[Resium + CesiumJS]
+    Geo[本地 DEM / OSM / NG-01] --> World
+    Imagery[在线卫星影像] --> World
+    UI <--> Store[本机存档与相册]
+    Flight -. 同一套模块 .-> API[可选 Node REST API]
 ```
 
-## GitHub Pages
+深入了解：[架构与数据流](docs/ARCHITECTURE.md) · [开发与部署](docs/DEVELOPMENT.md) · [API 契约](docs/API.md) · [验证记录](docs/release.md)
 
-Pages 只托管静态文件。生产构建输出网页、场景资源、只读 `api/v1/*.json` 及共享 `runtime/*.mjs`，使用相对路径支持项目子目录。Node API 仅用于本机联调或另行部署。
+## 当前范围与下一步
 
-`.github/workflows/pages.yml` 在 main 推送时运行全部检查并发布 `dist/`。仓库 Pages 构建源需设为 GitHub Actions。运行时不需要私密凭证；不要把私密 key 放入 `VITE_*` 环境变量或前端代码。
+首版专注 **维港观景区的一条概念航线**；香港区域地形覆盖更广，但尚未开放全港自由飞行。飞机、起降场和航线是未来设想，游戏保护不代表真实空域许可或工程安全验证。
 
-数据与第三方条款见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)，API 见 [docs/API.md](docs/API.md)。
+已完成：双模式、三镜头、地标、摄影、恢复存档与 GitHub Pages Demo。接下来希望优先探索：
+
+- [ ] 更精细的香港建筑、材质与座舱，先解决数据授权和加载成本。
+- [ ] 更多经过地形与体验验证的观景航线。
+- [ ] 手机真机性能优化、更多浏览器与 GPU 验证。
+- [ ] 中英界面切换与更完整的无障碍操作。
+
+以上是方向，不是已发布能力或交付日期承诺。当前不包含无人机物流、运营经营和专业飞行训练。
+
+## 参与与许可
+
+欢迎用 [Issue](https://github.com/hexing-ai/nextgen-evtol/issues) 分享体验反馈、复现问题和最想看到的香港航线；提交前可看 [参与指南](CONTRIBUTING.md)。如果你也想看到香港未来空中出行的样子，欢迎 **Star**，方便回来追踪下一次更新。
+
+本项目复用 CesiumJS、Resium、React 等开源组件，参考 Flight3DView 的播放与镜头组织方式，未复制其源文件。**原创项目代码目前尚未指定开源许可证**；公开可浏览不等于已授予自由再分发或商用许可。OSM 派生数据库按 ODbL 1.0 提供，第三方组件、地形与影像各自遵循其条款。详见 [第三方代码与数据声明](THIRD_PARTY_NOTICES.md)。

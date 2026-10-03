@@ -1,0 +1,29 @@
+name: 问题反馈 / Bug report
+description: 帮助我们复现飞行、画面、安装或存档问题。
+title: "[Bug] "
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: 复现步骤 / Steps to reproduce
+      description: 说明模式、镜头、航程时间；是否能在在线 Demo 重现。
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 期待与实际结果 / Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: 设备环境 / Environment
+      description: 浏览器版本、系统、设备或 GPU；本地运行请补充 Node 版本。
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 截图或错误 / Screenshots or errors
+      description: 可拖入截图；请勿包含 token、cookie 或其他私密内容。

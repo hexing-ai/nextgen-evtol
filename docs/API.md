@@ -59,7 +59,7 @@ state = stepFlight(scene, state, { throttle: 1 }, 1 / 60);
 state = setPaused(state, 'focus');
 ```
 
-这只是接口用法示例，前端实现尚未开始。保存状态读取后先调用 `validateCheckpoint`，由用户继续再清除暂停原因。输入系统需在失焦后清除按键，不得把后台累计时间传入 `stepFlight`。
+这是独立调用方的接口用法示例。现有 React 前端直接导入共享模块和场景 JSON。保存状态读取后先调用 `validateCheckpoint`，由用户继续再清除暂停原因。输入系统需在失焦后清除按键，不得把后台累计时间传入 `stepFlight`。
 
 ## 状态与单位
 
@@ -70,10 +70,10 @@ state = setPaused(state, 'focus');
 - `pauseReason` 为 null、user、focus、resources；模式与镜头不受暂停影响，但暂停时不推进位置。
 - `setMode` 不直接改变位置、朝向、速度。接回段与正常驾驶均通过几何保护；路径受阻时悬停。
 - `discoverLandmark` 只做已知 ID 和去重；实际可见性与用户打开行为由前端结合场景判断。
-- 初版障碍代理是示意盒，不是香港实测建筑。正式地理集成后需替换与重验。
+- 当前建筑障碍代理来自 OSM 派生坐标与简化包围盒，并结合 DEM 保护网格；不是实测安全边界。更换地理数据后需重新校验。
 
 ## GitHub Pages 兼容
 
-`npm run export:static` 产生 8 份 JSON、校验和清单及共享模块。manifest 中资源是相对路径，可部署于 `/nextgen-evtol/` 等项目子路径，不依赖根路径或后端域名。当前导出不包含页面，也不会自行发布。
+`npm run export:static` 产生 8 份 JSON、校验和清单及共享模块。manifest 中资源是相对路径，可部署于 `/nextgen-evtol/` 等项目子路径，不依赖根路径或后端域名。单独运行导出命令不包含页面；`npm run build` 会先完成 Vite 网页构建，再执行此导出。
 
-后续前端批准后合并 Vite 的静态构建，保留同一份数据版本和逻辑版本，新增 Pages 发布工作流。不要尝试让 Pages 执行 Node 服务器，也不要为没有云存档的体验新增数据库。
+当前 `.github/workflows/pages.yml` 会检查并发布完整 `dist/`。Pages 只提供静态文件，不能执行 Node 服务器或动态 POST；前端飞行计算在浏览器完成，无需数据库。参见 [架构](ARCHITECTURE.md) 与 [部署步骤](DEVELOPMENT.md)。

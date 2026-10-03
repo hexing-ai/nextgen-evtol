@@ -1,0 +1,18 @@
+name: 体验与航线建议 / Experience idea
+description: 分享你想体验的风景、航线或操作改进。
+title: "[Idea] "
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: 想解决的体验问题 / Player need
+      description: 谁会在什么情况下需要它？
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: 建议 / Proposal
+      description: 航线请注明起终点和沿途景观；数据或模型请附来源与许可。
+    validations:
+      required: true

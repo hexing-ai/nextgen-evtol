@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 先体验在线 Demo / Try the demo
+    url: https://hexing-ai.github.io/nextgen-evtol/
+    about: 浏览器里登机，体验乘客观景与轻驾驶。
